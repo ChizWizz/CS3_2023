@@ -64,26 +64,22 @@
       background-color: blue;
     }
 
-    .score {
+    .score-container {
       font-family: 'Press Start 2P', cursive;
       position: absolute;
       top: 10px;
-      left: 10px;
+      right: 10px;
       color: white;
       font-size: 20px;
     }
 
     .return-home {
       font-family: 'Press Start 2P', cursive;
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
       color: white;
       font-size: 20px;
       text-decoration: underline;
       cursor: pointer;
-      z-index: 999; /* Ensure it's above other elements */
+      z-index: 999;
     }
   </style>
 </head>
@@ -197,6 +193,9 @@
     });
   </script>
 
-  <div class="score">Score: 0</div>
+  <div class="score-container">
+    <div class="score">Score: 0</div>
+    <div class="return-home">Return Home</div>
+  </div>
 </body>
 </html>
