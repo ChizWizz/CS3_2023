@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRUSHTEROIDS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background-image: url("bg.png");
+      background-size: cover;
+      background-position: center;
+      font-family: sans-serif;
+      overflow-x: hidden;
+      overflow-y: hidden;
+    }
+
+    .container {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 40px;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .play-button {
+      width: 600px;
+      height: 300px;
+      margin-left: 300px;
+      background-image: url("playbutton.png");
+      background-size: contain;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    .spaceship {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100px;
+      height: auto;
+    }
+
+    .asteroid {
+      position: absolute;
+      top: -100px;
+      width: 50px;
+      height: auto;
+    }
+
+    .bullet {
+      position: absolute;
+      width: 5px;
+      height: 20px;
+      background-color: blue;
+    }
+
+    .score {
+      font-family: 'Press Start 2P', cursive;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 20px;
+    }
+
+    .return-home {
+      font-family: 'Press Start 2P', cursive;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 20px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <audio id="backgroundMusic" src="music1.mp3" loop></audio>
+  <div class="container">
+    <div class="title">CRUSHTEROIDS</div>
+    <div class="play-button"></div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const backgroundMusic = document.getElementById("backgroundMusic");
+      const playButton = document.querySelector('.play-button');
+      const container = document.querySelector('.container');
+      let score = 0;    
+
+      backgroundMusic.volume = 0.5;
+
+      playButton.addEventListener('click', function() {
+        backgroundMusic.play();
+        container.remove();
+
+        const spaceship = document.createElement('img');
+        spaceship.src = 'spaceship.png';
+        spaceship.className = 'spaceship';
+        document.body.appendChild(spaceship);
+
+        document.addEventListener('mousemove', function(event) {
+          const x = event.clientX;
+          spaceship.style.left = x + 'px';
+        });
+
+        function createAsteroid() {
+          const asteroid = document.createElement('img');
+          asteroid.src = 'asteroid.png';
+          asteroid.className = 'asteroid';
+          const size = Math.random() * 100 + 80;
+          asteroid.style.width = size + 'px';
+          const xPosition = Math.random() * (window.innerWidth - size);
+          asteroid.style.left = xPosition + 'px';
+          document.body.appendChild(asteroid);
+          const speed = Math.random() * 1 + 0.1;
+          let topPosition = -100;
+          function moveAsteroid() {
+            topPosition += speed;
+            asteroid.style.top = topPosition + 'px';
+            if (topPosition < window.innerHeight) {
+              requestAnimationFrame(moveAsteroid);
+            } else {
+              asteroid.remove();
+            }
+          }
+          moveAsteroid();
+        }
+
+        for (let i = 0; i < 2; i++) {
+          createAsteroid();
+        }
+
+        const asteroidInterval = setInterval(createAsteroid, 5000);
+        
+        document.addEventListener('click', createBullet);
+
+        function createBullet(event) {
+          const spaceship = document.querySelector('.spaceship');
+          const bullet = document.createElement('div');
+          bullet.className = 'bullet';
+          bullet.style.left = spaceship.offsetLeft - 50  + (spaceship.offsetWidth / 2) - (bullet.offsetWidth / 2) + 'px';
+          bullet.style.bottom = spaceship.offsetHeight + 'px';
+          document.body.appendChild(bullet);
+          let bulletTop = parseInt(bullet.style.bottom);
+          const bulletSpeed = 5;
+          function moveBullet() {
+            bulletTop += bulletSpeed;
+            bullet.style.bottom = bulletTop + 'px';
+            const asteroids = document.querySelectorAll('.asteroid');
+            asteroids.forEach(asteroid => {
+              const asteroidRect = asteroid.getBoundingClientRect();
+              const bulletRect = bullet.getBoundingClientRect();
+              if (
+                bulletRect.left < asteroidRect.right &&
+                bulletRect.right > asteroidRect.left &&
+                bulletRect.top < asteroidRect.bottom &&
+                bulletRect.bottom > asteroidRect.top
+              ) {
+                asteroid.remove();
+                bullet.remove();
+                score += 10;
+                document.querySelector('.score').innerText = 'Score: ' + score;
+              }
+            });
+            if (bulletTop < window.innerHeight) {
+              requestAnimationFrame(moveBullet);
+            } else {
+              bullet.remove();
+            }
+          }
+          moveBullet();
+        }
+      });
+
+      const returnHomeText = document.createElement('div');
+      returnHomeText.textContent = 'Return Home';
+      returnHomeText.className = 'return-home';
+      returnHomeText.addEventListener('click', () => {
+        location.reload();
+      });
+      document.body.appendChild(returnHomeText);
+    });
+  </script>
+
+  <div class="score">Score: 0</div>
+</body>
+</html>
